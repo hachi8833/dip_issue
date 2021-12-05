@@ -1,0 +1,42 @@
+version: "3.8"
+
+x-var: &APP_IMAGE_TAG
+  "nuxt_app:1.0.0"
+x-var: &NODE_MAJOR
+  16
+x-var: &YARN_VERSION
+  v1.22.15
+x-var: &NODE_ENVIRONMENT
+  ${NODE_ENV:-development}
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./.dockerdev/Dockerfile
+      args:
+        NODE_MAJOR: *NODE_MAJOR
+      target: development
+    image: *APP_IMAGE_TAG
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    environment:
+      NODE_ENV: *NODE_ENVIRONMENT
+      HISTFILE: /app/.bash_history
+      HOST: 0.0.0.0
+      # NUXT_HOST: 0.0.0.0
+    volumes:
+      - .:/app:cached
+      - .dockerdev/.bashrc:/root/.bashrc:ro
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+      # - '0.0.0.0:3000:3000'
+      # - '0.0.0.0:9229:9229'
+    command: /bin/bash
+
+volumes:
+  app:

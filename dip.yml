@@ -1,0 +1,37 @@
+version: '7.2.0'
+
+compose:
+  files:
+    - docker-compose.yml
+
+interaction:
+  sh:
+    description: open a Bash shell
+    service: app
+    command: bash
+
+  yarn:
+    description: Run Yarn commands
+    service: app
+    command: yarn
+    subcommands:
+      dev:
+        description: Run Node server in development mode
+        command: yarn dev
+        compose:
+          run_options: [service-ports, use-aliases]
+      debug:
+        description: Run Node server in development mode with an opened debug port
+        command: yarn debug
+        compose:
+          run_options: [service-ports, use-aliases]
+
+  lint:
+    description: Run Standard linter
+    service: app
+    command: yarn eslint .
+    compose:
+      run_options: [no-deps]
+
+provision:
+  - dip yarn install
